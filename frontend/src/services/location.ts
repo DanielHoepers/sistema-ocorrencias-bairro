@@ -24,8 +24,12 @@ type NominatimResponse = {
 };
 
 export async function getCurrentLocationAddress(): Promise<BrowserLocationResult> {
+  if (!window.isSecureContext) {
+    throw new Error('A localização só funciona em conexão segura. Abra o sistema pelo endereço https.');
+  }
+
   if (!('geolocation' in navigator)) {
-    throw new Error('Não foi possível usar a localização. Preencha o endereço manualmente.');
+    throw new Error('Este celular ou navegador não liberou a localização. Preencha o endereço manualmente.');
   }
 
   const position = await getCurrentPosition();
@@ -51,22 +55,40 @@ export function mapUrl(latitude?: number | null, longitude?: number | null) {
 }
 
 function getCurrentPosition() {
-  return new Promise<GeolocationPosition>((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 12000,
-      maximumAge: 60000,
-    });
+  return requestPosition({
+    enableHighAccuracy: false,
+    timeout: 25000,
+    maximumAge: 300000,
+  }).catch((error: GeolocationPositionError) => {
+    if (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) {
+      return requestPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 0,
+      });
+    }
+
+    throw error;
   }).catch((error: GeolocationPositionError) => {
     if (error.code === error.PERMISSION_DENIED) {
-      throw new Error('Não foi possível usar a localização. Preencha o endereço manualmente.');
+      throw new Error('Permissão de localização negada. No celular, libere a localização para o navegador e tente novamente.');
     }
 
     if (error.code === error.TIMEOUT) {
-      throw new Error('Não foi possível localizar a tempo. Tente novamente ou preencha manualmente.');
+      throw new Error('Não foi possível localizar a tempo. Ative a localização do celular, aproxime-se de uma área com sinal e tente novamente.');
+    }
+
+    if (error.code === error.POSITION_UNAVAILABLE) {
+      throw new Error('O celular não conseguiu informar a localização agora. Verifique se o GPS/localização está ativo.');
     }
 
     throw new Error('Não foi possível buscar sua localização agora.');
+  });
+}
+
+function requestPosition(options: PositionOptions) {
+  return new Promise<GeolocationPosition>((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
   });
 }
 
