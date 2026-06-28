@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:ocorrencias}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ocorrencias_db}
+    username: ${SPRING_DATASOURCE_USERNAME:ocorrencias_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:ocorrencias_pass}
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+    open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_JPA_FORMAT_SQL:true}
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED:true}
+
+server:
+  port: ${PORT:${SERVER_PORT:8080}}
+  forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:native}
+
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:3000,http://127.0.0.1:3000,http://localhost}
+    allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://192.168.*.*:*,http://10.*.*.*:*,http://172.*.*.*:*}
+  jwt:
+    secret: ${APP_JWT_SECRET:chave-super-secreta-do-sistema-de-ocorrencias-bairro-2026}
+    expiration-seconds: ${APP_JWT_EXPIRATION_SECONDS:7200}
+  auth:
+    cookie-name: ${APP_AUTH_COOKIE_NAME:bairro_token}
+    cookie-secure: ${APP_AUTH_COOKIE_SECURE:false}
+    cookie-same-site: ${APP_AUTH_COOKIE_SAME_SITE:Lax}
+  admin:
+    create-enabled: ${APP_ADMIN_CREATE_ENABLED:false}
+    name: ${APP_ADMIN_NAME:Administrador}
+    email: ${APP_ADMIN_EMAIL:}
+    password: ${APP_ADMIN_PASSWORD:}
