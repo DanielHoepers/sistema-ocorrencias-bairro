@@ -1,14 +1,15 @@
-import { API_BASE_URL, API_URL } from '../constants';
+import { API_BASE_URL, API_URL, AUTH_TOKEN_STORAGE_KEY } from '../constants';
 import type { AdminUser, AuditLog, AuthForm, AuthUser, BackendPage, LoadOccurrencesOptions, Occurrence, UserProfileForm } from '../types';
 
 async function request(path: string, options?: RequestInit) {
+  const headers = new Headers(options?.headers);
+  headers.set('Content-Type', 'application/json');
+  addAuthHeader(headers);
+
   const response = await fetch(path, {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options?.headers ?? {}),
-    },
     ...options,
+    headers,
   });
 
   if (response.status === 401 || response.status === 403) {
@@ -31,8 +32,12 @@ async function request(path: string, options?: RequestInit) {
 }
 
 export async function getCurrentUser() {
+  const headers = new Headers();
+  addAuthHeader(headers);
+
   const response = await fetch(`${API_BASE_URL}/auth/me`, {
     credentials: 'include',
+    headers,
   });
 
   if (response.status === 204) {
@@ -64,9 +69,13 @@ export async function submitAuth(authMode: 'login' | 'register', authForm: AuthF
 }
 
 export async function logoutSession() {
+  const headers = new Headers();
+  addAuthHeader(headers);
+
   await fetch(`${API_BASE_URL}/auth/logout`, {
     method: 'POST',
     credentials: 'include',
+    headers,
   });
 }
 
@@ -153,4 +162,12 @@ export async function deleteOccurrence(id: string) {
   await request(`${API_URL}/${id}`, {
     method: 'DELETE',
   });
+}
+
+function addAuthHeader(headers: Headers) {
+  const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 }

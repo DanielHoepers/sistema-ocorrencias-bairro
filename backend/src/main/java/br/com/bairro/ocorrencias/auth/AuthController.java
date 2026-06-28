@@ -151,8 +151,14 @@ public class AuthController {
     }
 
     private AuthResponse authenticate(User user, HttpServletResponse response) {
-        authCookieService.addTokenCookie(response, jwtService.generateToken(user));
-        return toAuthResponse(user);
+        String token = jwtService.generateToken(user);
+        authCookieService.addTokenCookie(response, token);
+        return new AuthResponse(
+                user.getName(),
+                user.getEmail(),
+                user.getRole().name(),
+                token
+        );
     }
 
     private AuthResponse toAuthResponse(User user) {

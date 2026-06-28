@@ -1,11 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { AppLayout } from './components/AppLayout';
 import {
-  AUTH_USER_STORAGE_KEY,
   emptyAuthForm,
   emptyForm,
   LEGACY_AUTH_STORAGE_KEY,
-  OCCURRENCES_STORAGE_KEY,
 } from './constants';
 import { AdminScreen } from './screens/AdminScreen';
 import { AuthScreen } from './screens/AuthScreen';
@@ -29,7 +27,7 @@ import {
 } from './services/api';
 import { getCurrentLocationAddress } from './services/location';
 import type { AdminUser, AppView, AuditLog, AuthForm, AuthMode, AuthUser, LoadOccurrencesOptions, Occurrence, UserProfileForm } from './types';
-import { cacheOccurrences, cacheUser, readCachedOccurrences, readCachedUser } from './utils/cache';
+import { cacheAuthToken, cacheOccurrences, cacheUser, clearAuthCache, readCachedOccurrences, readCachedUser } from './utils/cache';
 
 function App() {
   const [user, setUser] = useState<AuthUser | null>(() => readCachedUser());
@@ -93,6 +91,7 @@ function App() {
       setAuthError('');
 
       const data = await submitAuth(authMode, authForm);
+      cacheAuthToken(data.token);
       cacheUser(data);
       setUser(data);
       setProfileForm(profileFormFromUser(data));
@@ -108,8 +107,7 @@ function App() {
   }
 
   function clearSession() {
-    localStorage.removeItem(AUTH_USER_STORAGE_KEY);
-    localStorage.removeItem(OCCURRENCES_STORAGE_KEY);
+    clearAuthCache();
     setUser(null);
     setOccurrences([]);
     setForm(emptyForm);

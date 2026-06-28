@@ -1,4 +1,4 @@
-import { AUTH_USER_STORAGE_KEY, OCCURRENCES_STORAGE_KEY } from '../constants';
+import { AUTH_TOKEN_STORAGE_KEY, AUTH_USER_STORAGE_KEY, OCCURRENCES_STORAGE_KEY } from '../constants';
 import type { AuthUser, Occurrence } from '../types';
 
 export function readCachedUser() {
@@ -17,7 +17,27 @@ export function readCachedUser() {
 }
 
 export function cacheUser(user: AuthUser) {
-  localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
+  const { token: _token, ...safeUser } = user;
+  localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(safeUser));
+}
+
+export function readCachedToken() {
+  return localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+}
+
+export function cacheAuthToken(token?: string | null) {
+  if (!token) {
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    return;
+  }
+
+  localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
+}
+
+export function clearAuthCache() {
+  localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+  localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+  localStorage.removeItem(OCCURRENCES_STORAGE_KEY);
 }
 
 export function readCachedOccurrences() {

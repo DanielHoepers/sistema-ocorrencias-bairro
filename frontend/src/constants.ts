@@ -5,6 +5,7 @@ export const API_URL = `${API_BASE_URL}/occurrences`;
 
 export const LEGACY_AUTH_STORAGE_KEY = 'bairro.auth';
 export const AUTH_USER_STORAGE_KEY = 'bairro.user';
+export const AUTH_TOKEN_STORAGE_KEY = 'bairro.token';
 export const OCCURRENCES_STORAGE_KEY = 'bairro.occurrences';
 
 export const emptyForm: Occurrence = {

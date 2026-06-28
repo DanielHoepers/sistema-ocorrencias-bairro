@@ -24,6 +24,7 @@ export type AuthUser = {
   name: string;
   email: string;
   role: string;
+  token?: string | null;
 };
 
 export type AuthForm = {
