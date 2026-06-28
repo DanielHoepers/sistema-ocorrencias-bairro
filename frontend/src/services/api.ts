@@ -16,6 +16,14 @@ async function request(path: string, options?: RequestInit) {
   }
 
   if (!response.ok) {
+    if (response.status === 409) {
+      throw new Error('E-mail já cadastrado.');
+    }
+
+    if (response.status === 400) {
+      throw new Error('Verifique os dados informados.');
+    }
+
     throw new Error(`Erro ${response.status}`);
   }
 

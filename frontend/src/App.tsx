@@ -100,8 +100,8 @@ function App() {
       setAuthForm(emptyAuthForm);
       setMessage('');
       await loadOccurrences({ keepView: true, silent: true });
-    } catch {
-      setAuthError('Não foi possível entrar. Verifique os dados informados.');
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Não foi possível entrar. Verifique os dados informados.');
     } finally {
       setAuthLoading(false);
     }
