@@ -65,4 +65,5 @@ export type AuthMode = 'login' | 'register';
 export type LoadOccurrencesOptions = {
   keepView?: boolean;
   silent?: boolean;
+  preserveSessionOnError?: boolean;
 };

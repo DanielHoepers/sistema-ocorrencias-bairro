@@ -98,7 +98,7 @@ function App() {
       setActiveView('dashboard');
       setAuthForm(emptyAuthForm);
       setMessage('');
-      await loadOccurrences({ keepView: true, silent: true });
+      await loadOccurrences({ keepView: true, silent: true, preserveSessionOnError: true });
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Não foi possível entrar. Verifique os dados informados.');
     } finally {
@@ -258,6 +258,12 @@ function App() {
       }
     } catch (err) {
       if (isSessionExpired(err)) {
+        if (options.preserveSessionOnError) {
+          setOccurrences([]);
+          setHasSearched(false);
+          return;
+        }
+
         clearSession();
         return;
       }
